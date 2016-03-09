@@ -44,7 +44,7 @@ class Syslinux():
                                                                                 "multibootusb"), shell=True) == 0:
                             print "Default Extlinux install is success..."
                             if subprocess.call('echo ' + config.user_password + ' | sudo -S dd bs=440 count=1 conv=notrunc if=' + mbr_bin +
-                                                                                    ' of=' + config.usb_disk[:-1], shell=True) == 0:
+                                                                                    ' of=' + config.usb_disk, shell=True) == 0:
                                 print "mbr install is success..."
                                 self.set_boot_flag()
                                 return True
@@ -57,7 +57,7 @@ class Syslinux():
                                                                                     "multibootusb"), shell=True) == 0:
                             print "\nExtlinux install on distro directory is success...\n"
                             if subprocess.call('dd bs=440 count=1 conv=notrunc if=' + mbr_bin +
-                                                                                    ' of=' + config.usb_disk[:-1], shell=True) == 0:
+                                                                                    ' of=' + config.usb_disk, shell=True) == 0:
                                 print "\nmbr install is success...\n"
                                 self.set_boot_flag()
                                 return True
@@ -76,7 +76,7 @@ class Syslinux():
                                         config.usb_disk, shell=True) == 0:
                         print "Default syslinux install is success..."
                         if subprocess.call('echo ' + config.user_password + ' | sudo -S dd bs=440 count=1 conv=notrunc if=' + mbr_bin +
-                                                                                        ' of=' + config.usb_disk[:-1], shell=True) == 0:
+                                                                                        ' of=' + config.usb_disk, shell=True) == 0:
                             print "mbr install is success..."
                             self.set_boot_flag()
                             return True
@@ -87,7 +87,7 @@ class Syslinux():
                     print "\nExecuting ==> " + syslinux + ' -i -d multibootusb ' + config.usb_disk + "\n"
                     if subprocess.call(syslinux + ' -i -d multibootusb ' + config.usb_disk, shell=True) == 0:
                         print "\nDefault syslinux install is success...\n"
-                        if subprocess.call('dd bs=440 count=1 conv=notrunc if=' + mbr_bin + ' of=' + config.usb_disk[:-1],
+                        if subprocess.call('dd bs=440 count=1 conv=notrunc if=' + mbr_bin + ' of=' + config.usb_disk,
                                            shell=True) == 0:
                             print "\nmbr install is success...\n"
                             self.set_boot_flag()
@@ -207,24 +207,24 @@ class Syslinux():
 
     def set_boot_flag(self):
         if platform.system() == "Linux":
-            print "Checking boot flag on " + config.usb_disk[:-1]
+            print "Checking boot flag on " + config.usb_disk
             if config.user_password:
-                cmd_out = subprocess.check_output("echo " + config.user_password + " | sudo -S parted -m -s " + config.usb_disk[:-1] + " print", shell=True)
+                cmd_out = subprocess.check_output("echo " + config.user_password + " | sudo -S parted -m -s " + config.usb_disk + " print", shell=True)
                 if "boot" in cmd_out:
                     print "Disk already has boot flag."
                 else:
-                    print "Executing ==>  parted " + config.usb_disk[:-1] + " set 1 boot on"
-                    if subprocess.call('echo ' + config.user_password + ' | sudo -S ' + " parted " + config.usb_disk[:-1]+ " set 1 boot on", shell=True) == 0:
-                        print "Boot flag set to bootable on " + config.usb_disk[:-1]
+                    print "Executing ==>  parted " + config.usb_disk + " set 1 boot on"
+                    if subprocess.call('echo ' + config.user_password + ' | sudo -S ' + " parted " + config.usb_disk+ " set 1 boot on", shell=True) == 0:
+                        print "Boot flag set to bootable on " + config.usb_disk
                     else:
-                        print "Unable to set boot flag on  " + config.usb_disk[:-1]
+                        print "Unable to set boot flag on  " + config.usb_disk
             else:
-                cmd_out = subprocess.check_output("parted -m -s " + config.usb_disk[:-1] + " print", shell=True)
+                cmd_out = subprocess.check_output("parted -m -s " + config.usb_disk + " print", shell=True)
                 if "boot" in cmd_out:
-                    print "Disk " + config.usb_disk[:-1] + " already has boot flag."
+                    print "Disk " + config.usb_disk + " already has boot flag."
                 else:
-                    print "Executing ==>  parted " + config.usb_disk[:-1] + " set 1 boot on"
-                    if subprocess.call("parted " + config.usb_disk[:-1]+ " set 1 boot on", shell=True) == 0:
-                        print "Boot flag set to bootable " + config.usb_disk[:-1]
+                    print "Executing ==>  parted " + config.usb_disk + " set 1 boot on"
+                    if subprocess.call("parted " + config.usb_disk+ " set 1 boot on", shell=True) == 0:
+                        print "Boot flag set to bootable " + config.usb_disk
                     else:
-                        print "Unable to set boot flag on  " + config.usb_disk[:-1]
+                        print "Unable to set boot flag on  " + config.usb_disk

@@ -13,7 +13,7 @@ import subprocess
 import platform
 import ctypes
 import config
-
+import pydm
 
 if platform.system() == "Linux":
     sys.path.append('pyudev')
@@ -104,8 +104,11 @@ class USB():
                 context = pyudev.Context()
                 for device in context.list_devices(subsystem='block', DEVTYPE='partition', ID_FS_USAGE="filesystem",
                                                    ID_TYPE="disk", ID_BUS="usb"):
-                    if device['ID_BUS'] == "usb" and device['DEVTYPE'] == "partition":
+                    print ''
+                    print device
+                    if (device['DEVTYPE'] == 'disk') or (device['ID_BUS'] == "usb" and device['DEVTYPE'] == "partition") :
                         print device['DEVNAME']
+
                         devices.append(str(device['DEVNAME']))
             except:
                 bus = dbus.SystemBus()
@@ -183,16 +186,18 @@ class USB():
                     context = pyudev.Context()
                     for device in context.list_devices(subsystem='block', DEVTYPE='partition', ID_FS_USAGE="filesystem",
                                                        ID_TYPE="disk", ID_BUS="usb"):
-                        if device['ID_BUS'] == "usb" and device['DEVTYPE'] == "partition":
+                        if device['DEVTYPE'] == "disk" or (device['ID_BUS'] == "usb" and device['DEVTYPE'] == "partition"):
                             if (device['DEVNAME']) == usb_disk:
                                 uuid = str(device['ID_FS_UUID'])
                                 file_system = str(device['ID_FS_TYPE'])
 
-                                mount_point = str(os.popen('mount | grep %s | cut -d" " -f3' % usb_disk).read().strip())
+                                mount_point = str(os.popen('mount | grep Enc | cut -d" " -f3').read().strip())
                                 try:
                                     label = str(device['ID_FS_LABEL'])
                                 except:
                                     label = "No label."
+                            
+
                 except:
                     try:
                         """
@@ -263,6 +268,8 @@ class USB():
                 total_size = "Not mounted."
                 free_size = "Not mounted."
                 used_size = "Not mounted."
+
+            print _ntuple_diskusage(label, mount_point, uuid, file_system, device, total_size, free_size, used_size)
             return _ntuple_diskusage(label, mount_point, uuid, file_system, device, total_size, free_size, used_size)
 
     def imager_list_usb(self):
@@ -277,7 +284,7 @@ class USB():
                 if 'usb' in d and 'part' not in d:
                     path = os.path.join(basedir, d)
                     link = os.readlink(path)
-                    #print '/dev/' + os.path.basename(link)
+                    print 'by path - /dev/' + os.path.basename(link)
                     disk = os.path.normpath(os.path.join(os.path.dirname(path), link))
                     if self.disk_exist_in_fsdisk(disk) is True:
                         disks.append(disk)

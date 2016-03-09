@@ -28,6 +28,8 @@ class InstallDistro():
         Install selected ISO to USB disk.
         :return:
         """
+
+        print 'InstallDistro::install'
         self.iso = iso.ISO(config.iso_link)
         install_dir = os.path.join(config.usb_mount, "multibootusb", self.iso.iso_basename())
         if not os.path.exists(os.path.join(config.usb_mount, "multibootusb")):
@@ -97,6 +99,12 @@ class InstallDistro():
         """
         thrd = threading.Thread(target=self.install, name="install_progress")
         #thrd.daemon()
+        usb_disk_details = self.usb.get_usb(config.usb_disk)
+        config.usb_mount = usb_disk_details.mount
+
+        print config.usb_disk
+
+        print 'config.usb_mount = ' + config.usb_mount
         install_size = self.usb.disk_usage(config.usb_mount).used / 1024
         thrd.start()
         while thrd.is_alive():
